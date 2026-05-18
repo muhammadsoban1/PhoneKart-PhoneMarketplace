@@ -1,19 +1,15 @@
-{% load static %}
-<div class="my-8 max-w-6xl mx-auto pt-20" style="width: 80%; margin: auto;">
-    <h2 class="text-2xl font-semibold mb-4 text-center">Related Models</h2>
-
-    <div class="flex justify-center flex-wrap gap-6">
+<!-- Include the product Model description  -->
+{% load static %} 
+<div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-gray-800">Related Models</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for model in related_models %}
-    <div class="flex w-3/4 gap-4   ">
-        <div class="w-full sm:w-1/2 lg:w-1/2 p-4 border border-gray-200 rounded-lg hover:shadow-lg">
-            <img src="{% static model.image %}" alt="{{ model.name }}" class="w-full h-36 object-cover rounded">
-            <p class="mt-2 text-center font-medium">{{ model.name }}</p>
-        </div>
-        <div class="w-full sm:w-1/2 lg:w-1/2 p-4 border border-gray-200 rounded-lg hover:shadow-lg">
-            <img src="{% static model.image %}" alt="{{ model.name }}" class="w-full h-36 object-cover rounded">
-            <p class="mt-2 text-center font-medium">{{ model.name }}</p>
-        </div>
-    </div>
+            <div class="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-xl transform transition-all duration-200">
+                <a href="{% url 'marketplace:product_description_page' model.productID %}">
+                    <img src="{{ model.images.first.image.url }}" alt="{{ model.name }}" class="w-full h-40 object-cover rounded mb-4">
+                    <p class="text-center font-medium text-gray-700">{{ model.model }}</p>
+                </a>
+            </div>
         {% endfor %}
     </div>
 </div>

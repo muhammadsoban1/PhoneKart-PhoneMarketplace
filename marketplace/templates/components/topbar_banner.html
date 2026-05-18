@@ -6,6 +6,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Topbar Banner</title>
+    <style>
+      .search-bar {
+         z-index: 10; /* Ensure this is lower than the dropdown's z-index */
+       }
+       #dropdownMenu {
+        position: absolute;
+        top: 100%; /* Position below the toggle button */
+        right: 0;
+         background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 0.25rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 50; /* Ensure this is higher than overlapping components */
+        }
+
+        .relative-parent {
+          position: relative;
+         }
+
+
+    </style>
     {% tailwind_css %}
   </head>
   <body>
@@ -21,10 +42,20 @@
         </div>
         <div class="flex items-center justify-end pe-0 gap-3 lg:flex">
           {% if user.is_authenticated %}
-            <div class="flex items-center gap-2 cursor-pointer">
-              <span>Welcome, {{ user.first_name }}</span>
-              <!-- Logout link -->
-            </div>
+            <div class="relative">
+  <div class="flex items-center gap-2 cursor-pointer" onclick="toggleDropdown()">
+    <span class="flex">
+      Welcome, {{ user.first_name }}
+      <img src="{% static 'images/dropdown.png' %}" class="ml-2 mt-1 w-7 h-4">
+    </span>
+  </div>
+  <div id="dropdownMenu" class="absolute right-0 hidden bg-white border rounded shadow-md mt-2 z-50">
+  
+    <a href="{% url 'marketplace:logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
+  Logout
+     </a>
+  
+</div>
           {% else %}
             <div class="flex items-center gap-2 cursor-pointer">
               <img
@@ -33,9 +64,7 @@
                width="16"  
                height="16" 
                class="w-4 h-4 text-transparent" 
-               src="{% static 'log-out.png' %}"
-               
-              />
+               src="{% static 'log-out.png' %}" />
               <a href="{% url 'marketplace:signin' %}" class="hidden sm:inline">Sign In</a>
             </div>
           {% endif %}
@@ -44,4 +73,19 @@
     </main>
   </body>
 </html>
+<script>
+  document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('dropdownMenu');
+    const toggleButton = dropdown.previousElementSibling;
+    if (!dropdown.contains(event.target) && !toggleButton.contains(event.target)) {
+      dropdown.classList.add('hidden');
+    }
+  });
+
+  function toggleDropdown() {
+    const dropdown = document.getElementById('dropdownMenu');
+    dropdown.classList.toggle('hidden');
+  }
+</script>
+
 

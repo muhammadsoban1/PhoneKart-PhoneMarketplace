@@ -7,8 +7,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %} Dashboard {% endblock %}</title>
     {% tailwind_css %}
+
+<style>
+   .alert {
+    position: relative;
+    animation: slideInLeft 0.5s ease-in-out, fadeOut 4s 3s forwards;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+</style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-bluish">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar (responsive) -->
         <div class="lg:hidden bg-white shadow-md">

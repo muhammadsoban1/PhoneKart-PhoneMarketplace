@@ -1,62 +1,43 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block mtitle %}
-Booking Form
-{% endblock %}
-
-{% block content %}
-<div class="bg-blue-100">
-<div class="flex justify-center items-center h-screen bg-blue-100">
-    <!-- Booking Form -->
-    <div id="bookingForm" class="bg-white p-8 rounded-lg shadow-md w-1/3">
-        <h2 class="text-xl font-bold mb-4">Confirm Details for Booking</h2>
-        <form id="form">
-            <div class="mb-4">
-                <label for="phone" class="block mb-1 text-lg">Phone Number</label>
-                <input type="text" id="phone" class="w-full border border-gray-300 p-2 rounded" required>
-            </div>
-            <div class="mb-4">
-                <label for="cnic" class="block mb-1 text-lg">CNIC</label>
-                <input type="text" id="cnic" class="w-full border border-gray-300 p-2 rounded" required>
-            </div>
-            <div class="flex justify-center">
-                <button type="submit" class="bg-blue-500 text-white font-bold text-lg py-2 px-4 rounded hover:bg-blue-600">
-                    Confirm Booking
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Thank You Message (Initially Hidden) -->
-    <div id="thankYouMessage" class="hidden bg-white p-8 rounded shadow-md w-1/3 text-center">
-        <h2 class="text-2xl font-bold mb-4">Thank you for booking!</h2>
-        <div class= "flex justify-center mb-6">
-            <img
-            src="{% static 'check.png' %}"
-            alt="check mark"
-            class="w-36 h-36 mr-2"
-          />
-        </div>
-        <p class=" font-medium text-lg">Seller will contact you within 2 hours</p>
-        <button class="bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-600" onclick="location.reload()">
-            Close
-        </button>
-    </div>
-</div>
-</div>
-
 <script>
-    // JavaScript to handle form submission and show thank you message
     document.getElementById('form').addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent the form from submitting normally
+        event.preventDefault();
 
-        // Hide the booking form
-        document.getElementById('bookingForm').classList.add('hidden');
+        const phoneNumber = document.getElementById('phone').value;
+        
+        // Context se Product ID lein
+        const productId = "{{ product.productID }}"; 
 
-        // Show the thank you message
-        document.getElementById('thankYouMessage').classList.remove('hidden');
+        // URL ko Django ke URL tag se handle karein
+        const targetUrl = "{% url 'marketplace:confirm_booking' %}";
+
+        fetch(targetUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'product_id': productId,
+                'phone': phoneNumber
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('bookingForm').classList.add('hidden');
+                document.getElementById('thankYouMessage').classList.remove('hidden');
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Fetch failed! Check if server is running or URL is correct.");
+        });
     });
 </script>
-{% endblock %}
-

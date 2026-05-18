@@ -6,43 +6,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %} Dashboard {% endblock %}</title>
-{% tailwind_css %} <!-- Ensure this is included to load Tailwind -->
+    {% tailwind_css %}
+
+    <style>
+        /* Aapki provide ki hui custom red classes */
+        .bg-red-700-important { background-color: #b91c1c !important; }
+        .hover-bg-red-600-important:hover { background-color: #c2410c !important; }
+        
+        .bg-green-500-important { background-color: #22c55e !important; }
+        .hover-bg-green-600-important:hover { background-color: #16a34a !important; }
+    </style>
   </head>
+
   <body class="bg-gray-100">
     <div class="flex h-screen overflow-hidden">
-      <!-- Sidebar (responsive) -->
-      <div class="lg:hidden bg-white shadow-md">
-        <button id="sidebarToggle" class="p-4 focus:outline-none">
-          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      
+      <div class="lg:hidden bg-white shadow-md fixed top-0 left-0 right-0 z-50 flex items-center p-4">
+        <button id="sidebarToggle" class="focus:outline-none">
+          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
+        <span class="ml-4 font-bold text-gray-700">Admin Panel</span>
       </div>
 
-      <!-- Sidebar component -->
-      <div id="sidebar" class="hidden lg:block">
+      <div id="sidebar" class="hidden lg:block w-64 bg-white shadow-lg h-full transition-all duration-300">
         {% include 'components/adminsidebar.html' %}
       </div>
 
-      <!-- Main Dashboard Area -->
-      <div class="flex-1 overflow-auto">
-        <header class="p-6 bg-white shadow-md">
-          <h1 class="text-2xl font-bold text-gray-700">{% block pagetitle %} Dashboard {% endblock %}</h1>
-        </header>
-        {% block bcontent %}
-           
+      <div class="flex-1 flex flex-col overflow-hidden">
         
-        {% endblock %}
+        <header class="p-6 bg-white shadow-md flex justify-between items-center">
+          <h1 class="text-2xl font-bold text-gray-700">
+            {% block pagetitle %} Dashboard {% endblock %}
+          </h1>
 
-    </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-500 text-sm hidden sm:inline-block">
+                User: <span class="font-semibold text-gray-700">{{ request.user.username }}</span>
+            </span>
+            
+            <a href="{% url 'customAdmin:logout' %}" 
+               class="bg-red-700-important hover-bg-red-600-important:hover text-white px-5 py-2 rounded-lg font-medium transition duration-200 flex items-center gap-2 shadow-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </a>
+          </div>
+        </header>
+
+        <main class="flex-1 overflow-auto p-6">
+          {% block bcontent %}
+          {% endblock %}
+        </main>
+
+      </div>
     </div>
 
-    <!-- JavaScript to handle sidebar toggl -->
     <script>
       const sidebarToggle = document.getElementById('sidebarToggle');
       const sidebar = document.getElementById('sidebar');
+      
       sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('z-40');
       });
     </script>
   </body>

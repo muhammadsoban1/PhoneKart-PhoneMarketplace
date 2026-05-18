@@ -9,15 +9,15 @@ Brand
 {% endblock %}
 
 {% block bcontent %}
+
 <div class="p-6">
   <!-- Add Brand Button (Triggers the Popup) -->
-  <button id="addBrandBtn" class=" bg-bluish text-white font-bold mb-6 py-2 px-10 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+  <button id="addBrandBtn" class="bg-bluish text-white font-bold mb-6 py-2 px-10 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
     Add Brand
   </button>
 
   <!-- Popup Modal -->
-  <div class="flex justify-center">
-  <div id="brandPopup" class="hidden fixed inset-0 z-50 w-1/2 items-center justify-center mb-10">
+  <div id="brandPopup" class="hidden fixed inset-0 z-50 items-center justify-center">
     <!-- Popup Content -->
     <div class="bg-white rounded-lg shadow-lg p-6 w-full sm:w-1/3 relative z-10">
       <!-- Close Button -->
@@ -26,19 +26,18 @@ Brand
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      
+
       <!-- Popup Header -->
       <h2 class="text-2xl font-semibold mb-4 text-center text-blue-500">Add Brand</h2>
-      
+
       <!-- Category Selection -->
       <div class="mb-4">
         <label for="category" class="block text-lg font-medium">Category</label>
         <select id="category" class="w-full p-2 mt-2 border border-gray-300 rounded-lg">
           <option value="">Select a Category</option>
-          <!-- Add your category options here -->
-          <option value="electronics">Electronics</option>
-          <option value="fashion">Fashion</option>
-          <option value="home_appliances">Home Appliances</option>
+          {% for category in categories %}
+          <option value="{{ category.category_id }}">{{ category.name }}</option>
+          {% endfor %}
         </select>
       </div>
 
@@ -50,54 +49,114 @@ Brand
 
       <!-- Submit Button -->
       <div class="flex justify-center">
-        <button class="bg-bluish text-white py-2 px-6 rounded-lg hover:bg-blue-600 focus:outline-none">Add Brand</button>
+        <button id="submitBrandBtn" class="bg-bluish text-white py-2 px-6 rounded-lg hover:bg-blue-600 focus:outline-none">Add Brand</button>
       </div>
     </div>
-    </div>
-
-    <!-- Background Overlay (Blurred) -->
+    <!-- Background Overlay -->
     <div class="absolute inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm"></div>
   </div>
 
   <!-- Brand List -->
   <div class="flex flex-col">
-    <!-- Single Brand Row -->
+    {% for brand in brands %}
     <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md mb-4">
-      <div class="text-lg font-semibold text-gray-800">Brand Name</div>
+      <div class="text-lg font-semibold text-gray-800">{{ brand.name }}</div>
+      <div class="text-gray-500">{{ brand.category.name }}</div>
       <div class="flex space-x-4">
-        <button class="bg-bluish text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+        <button class="bg-bluish text-white font-bold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none">
           Edit
+        </button>
+        <button class="bg-red-700-important text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none deleteBrandBtn" data-id="{{ brand.id }}">
+          Delete
         </button>
       </div>
     </div>
+    {% empty %}
+    <p class="text-center text-gray-500">No brands found.</p>
+    {% endfor %}
   </div>
 </div>
 
-<!-- Script for handling popup -->
+<!-- JavaScript for handling the modal and AJAX -->
 <script>
-  // Get the button and popup elements
+  // Modal elements
   const addBrandBtn = document.getElementById('addBrandBtn');
   const brandPopup = document.getElementById('brandPopup');
   const closePopupBtn = document.getElementById('closePopupBtn');
+  const submitBrandBtn = document.getElementById('submitBrandBtn');
+  const categorySelect = document.getElementById('category');
+  const brandInput = document.getElementById('brand');
 
-  // Show the popup when Add Brand is clicked
+  // Show modal
   addBrandBtn.addEventListener('click', () => {
     brandPopup.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden'); // Prevent scrolling when popup is active
+    brandPopup.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
   });
 
-  // Hide the popup when close button is clicked
+  // Hide modal
   closePopupBtn.addEventListener('click', () => {
     brandPopup.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden'); // Allow scrolling again
+    brandPopup.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
   });
 
-  // Hide the popup when clicking outside the modal
-  window.addEventListener('click', (e) => {
-    if (e.target === brandPopup.querySelector('.absolute.inset-0')) {
-      brandPopup.classList.add('hidden');
-      document.body.classList.remove('overflow-hidden');
+  // Add brand
+  submitBrandBtn.addEventListener('click', () => {
+    const data = {
+      category: categorySelect.value, // Send UUID as the category ID
+      name: brandInput.value.trim(),
+    };
+
+    if (!data.category || !data.name) {
+      alert('Category and brand name are required.');
+      return;
     }
+
+    fetch("{% url 'customAdmin:brand' %}", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          location.reload(); // Reload page to show new brand
+        } else {
+          alert(data.message);
+        }
+      });
+  });
+
+  // Delete brand
+  document.querySelectorAll('.deleteBrandBtn').forEach(button => {
+    button.addEventListener('click', function () {
+      const brandId = this.dataset.id;
+
+      if (!confirm('Are you sure you want to delete this brand?')) {
+        return;
+      }
+
+      fetch("{% url 'customAdmin:brand' %}?id=" + brandId, {
+        method: "DELETE",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            location.reload();
+          } else {
+            alert(data.message);
+          }
+        });
+    });
   });
 </script>
 {% endblock %}

@@ -140,8 +140,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS =[os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    BASE_DIR / "theme" / "static_src",  # Add all static directories
+]
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -158,7 +162,10 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = 'marketplace.CustomUser'
 
 LOGIN_URL = '/seller/'
+LOGOUT_REDIRECT_URL = '/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 

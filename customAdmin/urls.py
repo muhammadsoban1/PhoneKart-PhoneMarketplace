@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 
+
 app_name = 'customAdmin'
 
 urlpatterns = [
@@ -18,12 +19,23 @@ urlpatterns = [
 
     path('addphone/', views.addphone, name='addphone'),
 
-    path('addcategory/', views.category, name='category'),
+
+    path('category/', views.category, name='category'),
+
     path('addbrand/', views.brand, name='brand'),
-    path('addmodel/', views.model, name='model'),
-    path('specification/', views.specification, name='specification'),
-    path('adminsettings/', views.adminsettings, name='adminsettings'),
+    
+
+    path('model/', views.model, name='model'),
+
 
     
+    path('specification/', views.specification, name='specification'),
+    path('delete-specification/<int:model_id>/', views.delete_specification, name='delete_specification'),
+
+    path('get-models/', views.get_models_by_brand, name='get_models_by_brand'),
+
+    path('adminsettings/', views.adminsettings, name='adminsettings'),
+
+    path('logout/', views.admin_logout, name='logout'),
     
 ]

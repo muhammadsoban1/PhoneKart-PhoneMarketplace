@@ -40,16 +40,13 @@
         <h3 class="font-bold text-xl mb-4">Phone Kart</h3>
         <ul>
           <li class="text-gray-600 mb-2">
-            <a href="#about" class="hover:underline">About us</a>
+            <a href="{% url 'marketplace:aboutus' %}" class="hover:underline hover:text-bluish">About us</a>
           </li>
           <li class="text-gray-600 mb-2">
-            <a href="#stores" class="hover:underline">Stores</a>
+            <a href="#stores" class="hover:underline  hover:text-bluish">Stores</a>
           </li>
           <li class="text-gray-600 mb-2">
-            <a href="#sitemap" class="hover:underline">Sitemap</a>
-          </li>
-          <li class="text-gray-600 mb-2">
-            <a href="#privacy" class="hover:underline">Privacy Policy</a>
+            <a href="{% url 'marketplace:privacypolicy' %}" class="hover:underline  hover:text-bluish">Privacy Policy</a>
           </li>
         </ul>
       </div>
